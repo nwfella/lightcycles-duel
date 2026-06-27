@@ -239,6 +239,133 @@
             will-change: transform;
         }
 
+        /* ── Joystick position variants ── */
+        #joyZone.pos-right {
+            left: auto; right: max(20px, env(safe-area-inset-right, 20px));
+            transform: none;
+        }
+        #joyZone.pos-left {
+            left: max(20px, env(safe-area-inset-left, 20px));
+            transform: none;
+        }
+        #joyZone.pos-center {
+            left: 50%; transform: translateX(-50%);
+        }
+
+        /* ── Keyboard hint (desktop) ── */
+        #keyboardHint {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 18px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(0,255,255,0.15);
+            border-radius: 6px;
+            color: rgba(0,255,255,0.4);
+            font-size: 13px;
+            letter-spacing: 1px;
+            z-index: 15;
+            pointer-events: none;
+            display: none;
+            text-align: center;
+        }
+        #keyboardHint.visible { display: block; }
+        #keyboardHint kbd {
+            display: inline-block;
+            padding: 2px 6px;
+            margin: 0 2px;
+            background: rgba(0,255,255,0.1);
+            border: 1px solid rgba(0,255,255,0.25);
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #0ff;
+            font-size: 12px;
+        }
+
+        /* ── Settings Panel ── */
+        #settingsScreen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.92);
+            z-index: 80;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        #settingsScreen.active { display: flex; }
+        #settingsContent {
+            background: #000;
+            border: 1px solid #0ff;
+            box-shadow: 0 0 30px rgba(0,255,255,0.15);
+            padding: 28px 24px;
+            max-width: 380px;
+            width: 100%;
+            border-radius: 8px;
+            color: #0ff;
+        }
+        #settingsContent h2 {
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 24px;
+            text-shadow: 0 0 10px #0ff;
+            letter-spacing: 3px;
+        }
+        .setting-group {
+            margin-bottom: 20px;
+        }
+        .setting-label {
+            font-size: 13px;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            opacity: 0.7;
+        }
+        .choice-row {
+            display: flex;
+            gap: 8px;
+        }
+        .choice-row button {
+            flex: 1;
+            padding: 10px 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            background: transparent;
+            border: 1px solid rgba(0,255,255,0.2);
+            color: rgba(0,255,255,0.5);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+        }
+        .choice-row button.active {
+            border-color: #0ff;
+            color: #0ff;
+            background: rgba(0,255,255,0.08);
+            box-shadow: 0 0 12px rgba(0,255,255,0.15);
+        }
+        .choice-row button:active {
+            transform: scale(0.96);
+        }
+        #settingsContent .close-btn {
+            display: block;
+            margin: 8px auto 0;
+            padding: 10px 40px;
+            background: transparent;
+            border: 2px solid #0ff;
+            color: #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        #settingsContent .close-btn:active {
+            background: #0ff;
+            color: #000;
+        }
+
         /* ── How to Play modal ── */
         #instructionsModal {
             display: none;
@@ -340,6 +467,7 @@
             <button id="btnPractice">🎮 Practice (vs AI)</button>
             <button id="btnOnline" class="btn-secondary">🌐 Online (Coming Soon)</button>
             <button id="btnHowTo" class="btn-secondary">❓ How to Play</button>
+            <button id="btnSettings" class="btn-secondary">⚙️ Settings</button>
         </div>
         <p class="version">v0.1 · Mobile PvP</p>
     </div>
@@ -357,6 +485,36 @@
             <button id="btnRematch">🔄 Rematch</button>
             <button id="btnMenu" class="btn-secondary">🏠 Main Menu</button>
         </div>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="settingsScreen">
+        <div id="settingsContent">
+            <h2>⚙️ SETTINGS</h2>
+            <div class="setting-group">
+                <div class="setting-label">JOYSTICK POSITION</div>
+                <div class="choice-row" id="joyPosChoices">
+                    <button data-pos="left">⬅ Left</button>
+                    <button data-pos="center" class="active">Center</button>
+                    <button data-pos="right">Right ➡</button>
+                </div>
+            </div>
+            <div class="setting-group">
+                <div class="setting-label">GAME SPEED</div>
+                <div class="choice-row" id="speedChoices">
+                    <button data-speed="slow">Slow</button>
+                    <button data-speed="normal">Normal</button>
+                    <button data-speed="fast" class="active">Fast</button>
+                    <button data-speed="ludicrous">🛸 Ludicrous</button>
+                </div>
+            </div>
+            <button class="close-btn" id="closeSettings">✓ Done</button>
+        </div>
+    </div>
+
+    <!-- Keyboard hint (desktop) -->
+    <div id="keyboardHint">
+        <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or <kbd>↑</kbd> <kbd>←</kbd> <kbd>↓</kbd> <kbd>→</kbd> to steer &nbsp;·&nbsp; <kbd>Space</kbd> to start
     </div>
 
     <!-- Instructions Modal -->
@@ -527,6 +685,62 @@ const EXPLOSION_DURATION = 800;
 const AI_DIFFICULTY = 'medium'; // easy | medium | hard
 
 // ═══════════════════════════════════════════════════════════════
+//  SETTINGS (persisted to localStorage)
+// ═══════════════════════════════════════════════════════════════
+
+const SPEED_PRESETS = {
+    slow:      140,
+    normal:    100,
+    fast:      85,    // ~15% faster than original 100
+    ludicrous: 55,
+};
+
+let settings = loadSettings();
+
+function defaultSettings() {
+    return {
+        joyPos: 'center',   // 'left' | 'center' | 'right'
+        speed:  'fast',     // 'slow' | 'normal' | 'fast' | 'ludicrous'
+    };
+}
+
+function loadSettings() {
+    try {
+        const raw = localStorage.getItem('lightcyclesDuelSettings');
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            return { ...defaultSettings(), ...parsed };
+        }
+    } catch(e) {}
+    return defaultSettings();
+}
+
+function saveSettings() {
+    try {
+        localStorage.setItem('lightcyclesDuelSettings', JSON.stringify(settings));
+    } catch(e) {}
+}
+
+function applySettings() {
+    // Joystick position
+    const jz = document.getElementById('joyZone');
+    jz.classList.remove('pos-center', 'pos-left', 'pos-right');
+    jz.classList.add('pos-' + settings.joyPos);
+
+    // Update active states in settings UI
+    document.querySelectorAll('#joyPosChoices button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.pos === settings.joyPos);
+    });
+    document.querySelectorAll('#speedChoices button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.speed === settings.speed);
+    });
+}
+
+const isTouchDevice = ('ontouchstart' in window) && navigator.maxTouchPoints > 0;
+// "Desktop" = no touch screen at all. Hybrid devices get both controls.
+const isDesktop = !('ontouchstart' in window);
+
+// ═══════════════════════════════════════════════════════════════
 //  GAME STATE
 // ═══════════════════════════════════════════════════════════════
 
@@ -539,7 +753,7 @@ let countdownTimer = 0;
 let explosions = [];
 let lastTime = 0;
 let accumulator = 0;
-let gameSpeed = 100;           // ms per tick
+let gameSpeed = SPEED_PRESETS[settings.speed]; // ms per tick
 let lastDirChange = 0;         // for engine sound dedup
 
 // ── Direction vector helpers ──
@@ -553,6 +767,25 @@ const DIRS = {
     W:  { x: -1, y: 0 },
     NW: { x: -0.707, y: -0.707 },
 };
+
+// ── Desktop keyboard input state ──
+const keysDown = new Set();
+const KEY_MAP = {
+    'w': 'N', 'W': 'N', 'ArrowUp': 'N',
+    's': 'S', 'S': 'S', 'ArrowDown': 'S',
+    'a': 'W', 'A': 'W', 'ArrowLeft': 'W',
+    'd': 'E', 'D': 'E', 'ArrowRight': 'E',
+};
+
+function getKeyboardDir() {
+    let dx = 0, dy = 0;
+    if (keysDown.has('N')) dy -= 1;
+    if (keysDown.has('S')) dy += 1;
+    if (keysDown.has('W')) dx -= 1;
+    if (keysDown.has('E')) dx += 1;
+    if (dx === 0 && dy === 0) return null;
+    return normalizeDir(dx, dy);
+}
 
 function normalizeDir(dx, dy) {
     const len = Math.sqrt(dx*dx + dy*dy);
@@ -723,7 +956,11 @@ function startCountdown() {
 function beginGame() {
     gameState = 'playing';
     countdown.classList.remove('visible');
-    joyZone.classList.add('active');
+    if (isDesktop) {
+        document.getElementById('keyboardHint').classList.add('visible');
+    } else {
+        joyZone.classList.add('active');
+    }
     initAudio();
     startEngine();
 }
@@ -731,6 +968,7 @@ function beginGame() {
 function gameOver(winner) {
     gameState = 'gameOver';
     joyZone.classList.remove('active');
+    document.getElementById('keyboardHint').classList.remove('visible');
     stopEngine(false);
     playExplosionSound();
 
@@ -778,6 +1016,7 @@ function goToMenu() {
     scoreBar.classList.remove('visible');
     modeBadge.classList.remove('visible');
     joyZone.classList.remove('active');
+    document.getElementById('keyboardHint').classList.remove('visible');
     gameState = 'menu';
     startScreen.style.display = 'flex';
 }
@@ -908,6 +1147,20 @@ function update() {
                 const changed = dirChanged(newDir, opponent.dir);
                 opponent.dir = newDir;
                 opponent.aiDirChangeTimer = 5 + Math.floor(Math.random() * 5);
+            }
+        }
+    }
+
+    // ── Keyboard input for human player ──
+    if (player && player.isHuman && isDesktop) {
+        const kbDir = getKeyboardDir();
+        if (kbDir) {
+            const reversal = dotProduct(kbDir, player.dir);
+            if (reversal > -0.9) {
+                if (dirChanged(kbDir, player.dir)) {
+                    player.dir = kbDir;
+                    playDirChange();
+                }
             }
         }
     }
@@ -1197,6 +1450,66 @@ document.getElementById('btnHowTo').addEventListener('click', (e) => {
     e.preventDefault();
     instructionsModal.classList.add('active');
 });
+document.getElementById('btnSettings').addEventListener('click', (e) => {
+    e.preventDefault();
+    applySettings();
+    document.getElementById('settingsScreen').classList.add('active');
+});
+
+// ── Settings UI ──
+function setupSettingsChoices(containerId, propName, callback) {
+    document.querySelectorAll(`#${containerId} button`).forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const val = btn.dataset.pos || btn.dataset.speed;
+            settings[propName] = val;
+            saveSettings();
+            applySettings();
+            if (callback) callback(val);
+        });
+    });
+}
+setupSettingsChoices('joyPosChoices', 'joyPos', (pos) => {
+    const jz = document.getElementById('joyZone');
+    jz.classList.remove('pos-center', 'pos-left', 'pos-right');
+    jz.classList.add('pos-' + pos);
+});
+setupSettingsChoices('speedChoices', 'speed', (speed) => {
+    gameSpeed = SPEED_PRESETS[speed];
+});
+
+document.getElementById('closeSettings').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('settingsScreen').classList.remove('active');
+});
+document.getElementById('settingsScreen').addEventListener('click', (e) => {
+    if (e.target.id === 'settingsScreen') {
+        document.getElementById('settingsScreen').classList.remove('active');
+    }
+});
+
+// ── Desktop keyboard input ──
+document.addEventListener('keydown', (e) => {
+    const mapped = KEY_MAP[e.key];
+    if (mapped) {
+        e.preventDefault();
+        keysDown.add(mapped);
+    }
+    if (e.code === 'Space') {
+        e.preventDefault();
+        if (gameState === 'countdown') {
+            countdownValue = 1;
+            countdownTimer = 100;
+        }
+    }
+});
+document.addEventListener('keyup', (e) => {
+    const mapped = KEY_MAP[e.key];
+    if (mapped) {
+        e.preventDefault();
+        keysDown.delete(mapped);
+    }
+});
 
 // Game over buttons
 document.getElementById('btnRematch').addEventListener('click', (e) => {
@@ -1246,6 +1559,9 @@ canvas.addEventListener('touchstart', (e) => {
 // ═══════════════════════════════════════════════════════════════
 //  START
 // ═══════════════════════════════════════════════════════════════
+
+// Apply saved settings on load
+applySettings();
 
 startScreen.style.display = 'flex';
 requestAnimationFrame(gameLoop);
