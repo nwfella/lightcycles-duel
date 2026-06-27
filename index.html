@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Lightcycles Duel</title>
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body {
@@ -433,6 +434,155 @@
                 height: min(120px, 20vh);
             }
         }
+
+        /* ── Lobby Screen ── */
+        #lobbyScreen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(ellipse at center, #001a1a, #000);
+            z-index: 60;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #lobbyScreen.active { display: flex; }
+
+        .lobby-card {
+            background: rgba(0,10,10,0.8);
+            border: 1px solid rgba(0,255,255,0.2);
+            border-radius: 12px;
+            padding: 30px 24px;
+            width: min(360px, 90vw);
+            text-align: center;
+        }
+        .lobby-card h2 {
+            color: #0ff;
+            font-size: clamp(20px, 5vw, 28px);
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 15px rgba(0,255,255,0.3);
+        }
+        .lobby-card .lobby-sub {
+            color: rgba(0,255,255,0.5);
+            font-size: 13px;
+            margin-bottom: 24px;
+            letter-spacing: 1px;
+        }
+        .lobby-card .mini-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .lobby-card button {
+            padding: 14px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(15px, 3.5vw, 18px);
+            font-weight: bold;
+            background: transparent;
+            border: 1px solid #0ff;
+            color: #0ff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .lobby-card button:active {
+            background: #0ff;
+            color: #000;
+            transform: scale(0.97);
+        }
+        .lobby-card button.lobby-secondary {
+            border-color: rgba(0,255,255,0.3);
+            color: rgba(0,255,255,0.6);
+        }
+
+        .room-code-display {
+            font-size: clamp(42px, 10vw, 64px);
+            letter-spacing: 12px;
+            color: #0ff;
+            text-shadow: 0 0 30px #0ff, 0 0 60px rgba(0,255,255,0.2);
+            margin: 16px 0;
+            font-weight: bold;
+            user-select: all;
+        }
+        .room-code-input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: clamp(24px, 6vw, 36px);
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            letter-spacing: 8px;
+            background: rgba(0,20,20,0.5);
+            border: 2px solid rgba(0,255,255,0.3);
+            color: #0ff;
+            border-radius: 8px;
+            outline: none;
+            text-transform: uppercase;
+            margin: 12px 0;
+        }
+        .room-code-input:focus {
+            border-color: #0ff;
+            box-shadow: 0 0 20px rgba(0,255,255,0.15);
+        }
+        .room-code-input::placeholder {
+            color: rgba(0,255,255,0.2);
+            letter-spacing: 4px;
+            font-size: clamp(14px, 3vw, 18px);
+        }
+
+        .conn-status {
+            margin-top: 16px;
+            padding: 8px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            border-radius: 4px;
+        }
+        .conn-status.connecting {
+            color: #ff0;
+            border: 1px solid rgba(255,255,0,0.3);
+        }
+        .conn-status.connected {
+            color: #0f0;
+            border: 1px solid rgba(0,255,0,0.3);
+        }
+        .conn-status.error {
+            color: #f44;
+            border: 1px solid rgba(255,68,68,0.3);
+        }
+
+        .back-btn {
+            margin-top: 16px;
+            padding: 8px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            background: transparent;
+            border: 1px solid rgba(0,255,255,0.2);
+            color: rgba(0,255,255,0.4);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .back-btn:active { border-color: #0ff; color: #0ff; }
+
+        /* ── TON Wallet badge ── */
+        #tonBadge {
+            position: fixed;
+            top: max(8px, env(safe-area-inset-top, 8px));
+            right: max(8px, env(safe-area-inset-right, 8px));
+            padding: 4px 10px;
+            font-size: 10px;
+            letter-spacing: 1px;
+            color: rgba(0,255,255,0.3);
+            border: 1px solid rgba(0,255,255,0.1);
+            border-radius: 4px;
+            background: rgba(0,0,0,0.5);
+            z-index: 5;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        #tonBadge:active { border-color: rgba(0,255,255,0.4); }
     </style>
 </head>
 <body>
@@ -515,6 +665,39 @@
     <!-- Keyboard hint (desktop) -->
     <div id="keyboardHint">
         <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or <kbd>↑</kbd> <kbd>←</kbd> <kbd>↓</kbd> <kbd>→</kbd> to steer &nbsp;·&nbsp; <kbd>Space</kbd> to start
+    </div>
+
+    <!-- TON Wallet Badge -->
+    <div id="tonBadge">💎 Disconnected</div>
+
+    <!-- Lobby Screen -->
+    <div id="lobbyScreen">
+        <div class="lobby-card" id="lobbyChoose">
+            <h2>🌐 ONLINE DUEL</h2>
+            <p class="lobby-sub">Challenge a friend! Choose your role.</p>
+            <div class="mini-grid">
+                <button id="btnHostRoom">👑 Host — Create Room</button>
+                <button id="btnJoinRoom" class="lobby-secondary">🔗 Join — Enter Code</button>
+                <button id="lobbyBack" class="lobby-secondary" style="margin-top:8px;font-size:12px;padding:8px;">← Back</button>
+            </div>
+        </div>
+
+        <div class="lobby-card" id="lobbyHost" style="display:none;">
+            <h2>👑 YOUR ROOM</h2>
+            <p class="lobby-sub">Share this code with your friend:</p>
+            <div class="room-code-display" id="roomCodeDisplay">------</div>
+            <div class="conn-status" id="hostStatus">⏳ Initializing...</div>
+            <button id="lobbyHostBack" class="back-btn">← Cancel</button>
+        </div>
+
+        <div class="lobby-card" id="lobbyJoin" style="display:none;">
+            <h2>🔗 JOIN GAME</h2>
+            <p class="lobby-sub">Enter the room code from your friend:</p>
+            <input type="text" class="room-code-input" id="roomCodeInput" placeholder="CODE" maxlength="6" autocomplete="off" spellcheck="false">
+            <button id="btnConnect" style="width:100%;margin-top:8px;">🔗 Connect</button>
+            <div class="conn-status" id="joinStatus" style="display:none;"></div>
+            <button id="lobbyJoinBack" class="back-btn">← Back</button>
+        </div>
     </div>
 
     <!-- Instructions Modal -->
@@ -741,6 +924,192 @@ const isTouchDevice = ('ontouchstart' in window) && navigator.maxTouchPoints > 0
 const isDesktop = !('ontouchstart' in window);
 
 // ═══════════════════════════════════════════════════════════════
+//  PEERJS NETWORKING
+// ═══════════════════════════════════════════════════════════════
+
+let peer = null;
+let conn = null;
+let isHost = false;
+let roomCode = null;
+let netSeq = 0;
+let lastRemoteSeq = 0;
+let remoteDisconnected = false;
+let netFullSyncCounter = 0;
+
+function generateRoomCode(id) {
+    // Use last 6 chars of PeerJS ID, uppercase
+    return id.slice(-6).toUpperCase();
+}
+
+function createPeer() {
+    if (peer) {
+        try { peer.destroy(); } catch(e) {}
+        peer = null;
+    }
+    peer = new Peer(undefined, { debug: 0 });
+    return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => reject('PeerJS timeout'), 10000);
+        peer.on('open', (id) => {
+            clearTimeout(timeout);
+            resolve(id);
+        });
+        peer.on('error', (err) => {
+            clearTimeout(timeout);
+            reject(err.type || 'PeerJS error');
+        });
+    });
+}
+
+async function hostRoom() {
+    try {
+        const id = await createPeer();
+        roomCode = generateRoomCode(id);
+        isHost = true;
+
+        document.getElementById('roomCodeDisplay').textContent = roomCode;
+        setHostStatus('⏳ Waiting for opponent...', 'connecting');
+
+        peer.on('connection', (incoming) => {
+            conn = incoming;
+            conn.on('open', () => {
+                setHostStatus('✅ Connected! Starting...', 'connected');
+                // Tell joiner their color is magenta
+                conn.send({ type: 'handshake', role: 'joiner', color: '#f0f' });
+                startOnlineGame();
+            });
+            conn.on('data', onReceiveData);
+            conn.on('close', () => {
+                remoteDisconnected = true;
+                setHostStatus('❌ Opponent disconnected', 'error');
+            });
+        });
+    } catch (err) {
+        setHostStatus('❌ Error: ' + err, 'error');
+    }
+}
+
+async function joinRoom(code) {
+    try {
+        const id = await createPeer();
+        const target = code.toUpperCase();
+
+        setJoinStatus('⏳ Connecting...', 'connecting');
+        document.getElementById('joinStatus').style.display = 'block';
+
+        conn = peer.connect(target, { reliable: true });
+        isHost = false;
+
+        const timeout = setTimeout(() => {
+            setJoinStatus('❌ Connection timed out', 'error');
+        }, 15000);
+
+        conn.on('open', () => {
+            clearTimeout(timeout);
+            setJoinStatus('✅ Connected! Starting...', 'connected');
+            conn.send({ type: 'handshake', role: 'host', color: '#0ff' });
+            startOnlineGame();
+        });
+        conn.on('data', onReceiveData);
+        conn.on('close', () => {
+            remoteDisconnected = true;
+            setJoinStatus('❌ Disconnected', 'error');
+        });
+        conn.on('error', (err) => {
+            clearTimeout(timeout);
+            setJoinStatus('❌ ' + (err.type || 'Connection failed'), 'error');
+        });
+    } catch (err) {
+        setJoinStatus('❌ ' + err, 'error');
+    }
+}
+
+function setHostStatus(text, cls) {
+    const el = document.getElementById('hostStatus');
+    el.textContent = text;
+    el.className = 'conn-status ' + (cls || '');
+}
+
+function setJoinStatus(text, cls) {
+    const el = document.getElementById('joinStatus');
+    el.textContent = text;
+    el.className = 'conn-status ' + (cls || '');
+}
+
+function sendStatePacket() {
+    if (!conn || !player) return;
+    const data = {
+        type: 'state',
+        seq: ++netSeq,
+        dir: player.dir,
+        trailPt: player.trail[player.trail.length - 1],
+        fullSync: false,
+    };
+    // Full sync every 25 ticks for reliability
+    netFullSyncCounter++;
+    if (netFullSyncCounter >= 25) {
+        netFullSyncCounter = 0;
+        data.fullSync = true;
+        data.trail = player.trail;
+    }
+    try { conn.send(data); } catch(e) {}
+}
+
+function onReceiveData(data) {
+    if (!data || !data.type) return;
+    switch (data.type) {
+        case 'handshake':
+            // Host receives this from joiner (or vice versa)
+            break;
+        case 'state':
+            if (!opponent) return;
+            if (data.seq && data.seq <= lastRemoteSeq) return; // dedup
+            lastRemoteSeq = data.seq || 0;
+
+            // Update opponent direction
+            if (data.dir) {
+                opponent.dir = data.dir;
+            }
+
+            // Update opponent position and trail
+            if (data.trailPt) {
+                opponent.x = data.trailPt.x;
+                opponent.y = data.trailPt.y;
+                opponent.trail.push({ x: data.trailPt.x, y: data.trailPt.y });
+            }
+
+            // Full sync: replace entire trail
+            if (data.fullSync && data.trail && data.trail.length > 1) {
+                opponent.trail = data.trail.map(p => ({ ...p }));
+            }
+            break;
+        case 'collision':
+            // Remote player detected a collision
+            // Host has authority: if we see it too, it's real
+            if (isHost) {
+                // Host resolves
+            }
+            break;
+    }
+}
+
+function closeConnection() {
+    if (conn) {
+        try { conn.close(); } catch(e) {}
+        conn = null;
+    }
+    if (peer) {
+        try { peer.destroy(); } catch(e) {}
+        peer = null;
+    }
+    isHost = false;
+    roomCode = null;
+    remoteDisconnected = false;
+    netSeq = 0;
+    lastRemoteSeq = 0;
+    netFullSyncCounter = 0;
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  GAME STATE
 // ═══════════════════════════════════════════════════════════════
 
@@ -953,6 +1322,35 @@ function startCountdown() {
     countdown.classList.add('visible');
 }
 
+function startOnlineGame() {
+    gameMode = 'online';
+    score = [0, 0];
+
+    const margin = 60;
+    const pSize = GRID * 2;
+
+    if (isHost) {
+        // Host is cyan (left), joiner is magenta (right)
+        player = createPlayer(margin + pSize, H / 2, { x: 1, y: 0 }, '#0ff', true);
+        opponent = createPlayer(W - margin - pSize, H / 2, { x: -1, y: 0 }, '#f0f', false);
+    } else {
+        // Joiner is magenta (left), host is cyan (right)
+        player = createPlayer(margin + pSize, H / 2, { x: 1, y: 0 }, '#f0f', true);
+        opponent = createPlayer(W - margin - pSize, H / 2, { x: -1, y: 0 }, '#0ff', false);
+    }
+
+    explosions = [];
+    frameCount = 0;
+    lastDirChange = 0;
+
+    modeBadge.textContent = 'ONLINE';
+    modeBadge.classList.add('visible');
+    scoreBar.classList.add('visible');
+    updateScoreDisplay();
+
+    startCountdown();
+}
+
 function beginGame() {
     gameState = 'playing';
     countdown.classList.remove('visible');
@@ -1008,7 +1406,12 @@ function updateScoreDisplay() {
 
 function resetMatch() {
     gameOverScreen.classList.remove('active');
-    initPractice();
+    if (gameMode === 'online' && conn) {
+        // Keep connection alive for rematch
+        startOnlineGame();
+    } else {
+        initPractice();
+    }
 }
 
 function goToMenu() {
@@ -1017,6 +1420,9 @@ function goToMenu() {
     modeBadge.classList.remove('visible');
     joyZone.classList.remove('active');
     document.getElementById('keyboardHint').classList.remove('visible');
+    closeConnection();
+    lobbyHideAll();
+    document.getElementById('lobbyScreen').classList.remove('active');
     gameState = 'menu';
     startScreen.style.display = 'flex';
 }
@@ -1138,8 +1544,8 @@ function update() {
 
     frameCount++;
 
-    // ── AI decision ──
-    if (opponent && !opponent.isHuman) {
+    // ── AI decision (practice mode) ──
+    if (opponent && !opponent.isHuman && gameMode === 'practice') {
         opponent.aiDirChangeTimer--;
         if (opponent.aiDirChangeTimer <= 0) {
             const newDir = aiChooseDirection(opponent, player);
@@ -1148,6 +1554,19 @@ function update() {
                 opponent.dir = newDir;
                 opponent.aiDirChangeTimer = 5 + Math.floor(Math.random() * 5);
             }
+        }
+    }
+
+    // ── Network sync (online mode) ──
+    if (gameMode === 'online') {
+        sendStatePacket();
+        // If remote disconnected, stop
+        if (remoteDisconnected) {
+            gameState = 'exploding';
+            stopEngine(false);
+            if (opponent) opponent.alive = false;
+            gameOver('player'); // local player wins by default
+            return;
         }
     }
 
@@ -1508,6 +1927,157 @@ document.addEventListener('keyup', (e) => {
     if (mapped) {
         e.preventDefault();
         keysDown.delete(mapped);
+    }
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  LOBBY UI
+// ═══════════════════════════════════════════════════════════════
+
+function lobbyHideAll() {
+    document.getElementById('lobbyChoose').style.display = 'block';
+    document.getElementById('lobbyHost').style.display = 'none';
+    document.getElementById('lobbyJoin').style.display = 'none';
+}
+
+function showLobby() {
+    lobbyHideAll();
+    document.getElementById('lobbyChoose').style.display = 'block';
+    document.getElementById('lobbyScreen').classList.add('active');
+    startScreen.style.display = 'none';
+}
+
+// Online button on start screen — was "Coming Soon", now opens lobby
+document.getElementById('btnOnline').addEventListener('click', (e) => {
+    e.preventDefault();
+    showLobby();
+});
+document.getElementById('btnOnline').addEventListener('touchend', (e) => {
+    e.preventDefault();
+    showLobby();
+});
+
+// Host — Create Room
+document.getElementById('btnHostRoom').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('lobbyChoose').style.display = 'none';
+    document.getElementById('lobbyHost').style.display = 'block';
+    document.getElementById('hostStatus').textContent = '⏳ Initializing...';
+    document.getElementById('hostStatus').className = 'conn-status';
+    hostRoom();
+});
+document.getElementById('btnHostRoom').addEventListener('touchend', (e) => {
+    e.preventDefault();
+    document.getElementById('lobbyChoose').style.display = 'none';
+    document.getElementById('lobbyHost').style.display = 'block';
+    hostRoom();
+});
+
+// Join — Enter Code
+document.getElementById('btnJoinRoom').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('lobbyChoose').style.display = 'none';
+    document.getElementById('lobbyJoin').style.display = 'block';
+    document.getElementById('joinStatus').style.display = 'none';
+    document.getElementById('roomCodeInput').value = '';
+    document.getElementById('roomCodeInput').focus();
+});
+document.getElementById('btnJoinRoom').addEventListener('touchend', (e) => {
+    e.preventDefault();
+    document.getElementById('lobbyChoose').style.display = 'none';
+    document.getElementById('lobbyJoin').style.display = 'block';
+    document.getElementById('roomCodeInput').value = '';
+});
+
+document.getElementById('btnConnect').addEventListener('click', (e) => {
+    e.preventDefault();
+    const code = document.getElementById('roomCodeInput').value.trim();
+    if (code.length < 4) {
+        document.getElementById('joinStatus').style.display = 'block';
+        setJoinStatus('❌ Enter a valid code', 'error');
+        return;
+    }
+    document.getElementById('lobbyChoose').style.display = 'none';
+    document.getElementById('lobbyJoin').style.display = 'block';
+    joinRoom(code);
+});
+
+// Auto-connect on Enter in code input
+document.getElementById('roomCodeInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('btnConnect').click();
+    }
+});
+
+// Back buttons
+document.getElementById('lobbyBack').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('lobbyScreen').classList.remove('active');
+    startScreen.style.display = 'flex';
+});
+document.getElementById('lobbyHostBack').addEventListener('click', (e) => {
+    e.preventDefault();
+    closeConnection();
+    lobbyHideAll();
+});
+document.getElementById('lobbyJoinBack').addEventListener('click', (e) => {
+    e.preventDefault();
+    closeConnection();
+    lobbyHideAll();
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  TELEGRAM MINI APP
+// ═══════════════════════════════════════════════════════════════
+
+if (window.Telegram && window.Telegram.WebApp) {
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+    // Set theme colors
+    document.body.style.background = tg.backgroundColor || '#000';
+    // Make the version badge show Telegram
+    document.querySelector('.version').textContent = '📱 Telegram · v0.2';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TON CONNECT (wallet badge)
+// ═══════════════════════════════════════════════════════════════
+
+let tonWallet = null;
+
+document.getElementById('tonBadge').addEventListener('click', async () => {
+    if (tonWallet) {
+        // Disconnect
+        tonWallet = null;
+        document.getElementById('tonBadge').textContent = '💎 Disconnected';
+        return;
+    }
+    // If TonConnect is available from CDN, use it
+    if (window.TonConnect) {
+        try {
+            const connector = new TonConnect.TonConnect({
+                manifestUrl: 'https://nwfella.github.io/lightcycles-duel/tonconnect-manifest.json'
+            });
+            await connector.connect({});
+            const wallet = connector.wallet;
+            if (wallet && wallet.account) {
+                const addr = wallet.account.address.slice(0, 6) + '...' + wallet.account.address.slice(-4);
+                tonWallet = wallet.account.address;
+                document.getElementById('tonBadge').textContent = '💎 ' + addr;
+            }
+        } catch(e) {
+            // User cancelled or error
+            document.getElementById('tonBadge').textContent = '💎 Error';
+        }
+    } else {
+        // TonConnect SDK not loaded — show placeholder
+        document.getElementById('tonBadge').textContent = '💎 TON (simulated)';
+        tonWallet = 'simulated';
+        setTimeout(() => {
+            document.getElementById('tonBadge').textContent = '💎 ' + 'UQ...abcd';
+        }, 500);
     }
 });
 
