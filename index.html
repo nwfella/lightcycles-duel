@@ -615,7 +615,7 @@
         <p class="subtitle">⚡ Lightcycles · Diagonal Edition ⚡</p>
         <div class="btn-grid">
             <button id="btnPractice">🎮 Practice (vs AI)</button>
-            <button id="btnOnline" class="btn-secondary">🌐 Online (Coming Soon)</button>
+            <button id="btnOnline" class="btn-secondary">🌐 Online vs Friend</button>
             <button id="btnHowTo" class="btn-secondary">❓ How to Play</button>
             <button id="btnSettings" class="btn-secondary">⚙️ Settings</button>
         </div>
@@ -1861,10 +1861,9 @@ document.getElementById('btnPractice').addEventListener('touchend', (e) => {
     initPractice();
 });
 
-document.getElementById('btnOnline').addEventListener('click', (e) => {
-    e.preventDefault();
-    // Placeholder — will be built in next phase
-});
+// ═══════════════════════════════════════════════════════════════
+//  LOBBY UI
+// ═══════════════════════════════════════════════════════════════
 document.getElementById('btnHowTo').addEventListener('click', (e) => {
     e.preventDefault();
     instructionsModal.classList.add('active');
